@@ -1,2 +1,2 @@
-# Socketize
-.NET UDP networking framework, based on Lidgren.Network with declarative message handling
+# :cloud: Socketize
+.NET UDP client-server networking framework with declarative message handling setup. Based on Lidgren.Network
