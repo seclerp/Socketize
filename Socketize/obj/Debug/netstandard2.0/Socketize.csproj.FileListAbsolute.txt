@@ -1,9 +1,0 @@
-D:\Study\SensorFusion\src\Socketize\bin\Debug\netstandard2.0\Socketize.deps.json
-D:\Study\SensorFusion\src\Socketize\bin\Debug\netstandard2.0\Socketize.dll
-D:\Study\SensorFusion\src\Socketize\bin\Debug\netstandard2.0\Socketize.pdb
-D:\Study\SensorFusion\src\Socketize\obj\Debug\netstandard2.0\Socketize.csprojAssemblyReference.cache
-D:\Study\SensorFusion\src\Socketize\obj\Debug\netstandard2.0\Socketize.csproj.CoreCompileInputs.cache
-D:\Study\SensorFusion\src\Socketize\obj\Debug\netstandard2.0\Socketize.AssemblyInfoInputs.cache
-D:\Study\SensorFusion\src\Socketize\obj\Debug\netstandard2.0\Socketize.AssemblyInfo.cs
-D:\Study\SensorFusion\src\Socketize\obj\Debug\netstandard2.0\Socketize.dll
-D:\Study\SensorFusion\src\Socketize\obj\Debug\netstandard2.0\Socketize.pdb
