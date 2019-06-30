@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize", "Socketize\Sock
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Extensions.DependencyInjection", "Socketize.Extensions.DependencyInjection\Socketize.Extensions.DependencyInjection.csproj", "{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Extensions.AspNetCore.Hosting", "Socketize.Extensions.AspNetCore.Hosting\Socketize.Extensions.AspNetCore.Hosting.csproj", "{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -6,6 +6,8 @@ using Socketize.Routing;
 
 namespace Socketize.Extensions.DependencyInjection
 {
+  // TODO: https://github.com/AndrewRublyov/Socketize/issues/5
+  // Implement better setup API for Client
   public static class ClientExtensions
   {
     public static IServiceCollection AddSocketizeClient<TRouteMap>(this IServiceCollection services, ClientOptions options) where TRouteMap : IRouteMap
@@ -53,7 +55,6 @@ namespace Socketize.Extensions.DependencyInjection
         serviceProvider.GetService<ILogger<Client>>(),
         options
       ));
-      services.AddHostedService<ServerHostedService>();
     }
 
     private static Schema CreateSchema<TRouteMap>(IServiceProvider serviceProvider)

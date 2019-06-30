@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Socketize.Abstractions;
 
-namespace Socketize.Extensions.DependencyInjection
+namespace Socketize.Extensions.AspNetCore.Hosting
 {
   public class ServerHostedService : IHostedService
   {

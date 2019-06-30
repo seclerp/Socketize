@@ -39,7 +39,6 @@ namespace Socketize.Extensions.DependencyInjection
         serviceProvider.GetService<ILogger<Server>>(),
         options
       ));
-      services.AddHostedService<ServerHostedService>();
     }
 
     private static Schema CreateSchema<TRouteMap>(IServiceProvider serviceProvider)
