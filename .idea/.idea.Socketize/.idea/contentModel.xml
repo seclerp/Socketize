@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Andrew\.Rider2019.1\config\consoles\db" t="IncludeRecursive" />
+    <e p="C:\Users\Andrew\.Rider2019.1\config\extensions" t="IncludeRecursive" />
+    <e p="C:\Users\Andrew\.Rider2019.1\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Andrew\.Rider2019.1\system\resharper-host\local\Transient\ReSharperHost\v191\SolutionCaches\_Socketize.-685304810.00" t="ExcludeRecursive" />
+    <e p="D:\Repo\Socketize" t="IncludeFlat">
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Socketize" t="IncludeRecursive">
+        <e p="Abstractions" t="Include">
+          <e p="IMessageHandler.cs" t="Include" />
+          <e p="IMessageHandlerFactory.cs" t="Include" />
+          <e p="IPeer.cs" t="Include" />
+          <e p="IRouteMap.cs" t="Include" />
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Client.cs" t="Include" />
+        <e p="ClientOptions.cs" t="Include" />
+        <e p="Context.cs" t="Include" />
+        <e p="Exceptions" t="Include">
+          <e p="SocketizeException.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.0" t="Include">
+              <e p="Socketize.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Options.cs" t="Include" />
+        <e p="Peer.cs" t="Include" />
+        <e p="ProcessingService.cs" t="Include" />
+        <e p="Routing" t="Include">
+          <e p="Schema.cs" t="Include" />
+          <e p="SchemaBuilder.cs" t="Include" />
+          <e p="SchemaItem.cs" t="Include" />
+          <e p="SchemaPart.cs" t="Include" />
+          <e p="SchemaPartBuilder.cs" t="Include" />
+          <e p="SpecialRouteNames.cs" t="Include" />
+        </e>
+        <e p="Server.cs" t="Include" />
+        <e p="ServerOptions.cs" t="Include" />
+        <e p="Socketize.csproj" t="IncludeRecursive" />
+      </e>
+      <e p="Socketize.Extensions.DependencyInjection" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="ClientExtensions.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.0" t="Include">
+              <e p="Socketize.Extensions.DependencyInjection.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="ServerExtensions.cs" t="Include" />
+        <e p="ServerHostedService.cs" t="Include" />
+        <e p="ServicesHandlerFactory.cs" t="Include" />
+        <e p="Socketize.Extensions.DependencyInjection.csproj" t="IncludeRecursive" />
+      </e>
+      <e p="Socketize.sln" t="IncludeFlat" />
+    </e>
+  </component>
+</project>

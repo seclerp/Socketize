@@ -1,0 +1,12 @@
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\bin\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.deps.json
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\bin\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.dll
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\bin\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.pdb
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\bin\Debug\netstandard2.0\Socketize.dll
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\bin\Debug\netstandard2.0\Socketize.pdb
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.csprojAssemblyReference.cache
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.csproj.CoreCompileInputs.cache
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.AssemblyInfoInputs.cache
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.AssemblyInfo.cs
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.csproj.CopyComplete
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.dll
+D:\Study\SensorFusion\src\Socketize.Extensions.DependencyInjection\obj\Debug\netstandard2.0\Socketize.Extensions.DependencyInjection.pdb

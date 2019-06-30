@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize", "Socketize\Socketize.csproj", "{BA6E2769-A5A4-4FEA-B024-BD1F45330928}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Extensions.DependencyInjection", "Socketize.Extensions.DependencyInjection\Socketize.Extensions.DependencyInjection.csproj", "{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
