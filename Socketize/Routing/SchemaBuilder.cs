@@ -8,12 +8,12 @@ namespace Socketize.Routing
   {
     private readonly IList<SchemaPartBuilder> _hubBuilders;
 
-    private readonly IList<SchemaItem> _specialItems;
+    private readonly IList<SchemaItem> _rootItems;
 
     public SchemaBuilder()
     {
       _hubBuilders = new List<SchemaPartBuilder>();
-      _specialItems = new List<SchemaItem>();
+      _rootItems = new List<SchemaItem>();
     }
 
     public SchemaPartBuilder Hub(string baseRoute)
@@ -25,7 +25,7 @@ namespace Socketize.Routing
 
     public SchemaBuilder OnConnect<TMessageHandler>() where TMessageHandler : IMessageHandler
     {
-      _specialItems.Add(new SchemaItem
+      _rootItems.Add(new SchemaItem
       {
         Route = SpecialRouteNames.ConnectRoute,
         HandlerType = typeof(TMessageHandler),
@@ -37,7 +37,7 @@ namespace Socketize.Routing
 
     public SchemaBuilder OnDisconnect<TMessageHandler>() where TMessageHandler : IMessageHandler
     {
-      _specialItems.Add(new SchemaItem
+      _rootItems.Add(new SchemaItem
       {
         Route = SpecialRouteNames.DisconnectRoute,
         HandlerType = typeof(TMessageHandler),
@@ -47,9 +47,33 @@ namespace Socketize.Routing
       return this;
     }
 
+    public SchemaBuilder Route<TMessageHandler>(string route) where TMessageHandler : IMessageHandler
+    {
+      _rootItems.Add(new SchemaItem
+      {
+        Route = route,
+        HandlerType = typeof(TMessageHandler),
+        MessageType = null
+      });
+
+      return this;
+    }
+
+    public SchemaBuilder Route<TMessage, TMessageHandler>(string route) where TMessageHandler : IMessageHandler<TMessage>
+    {
+      _rootItems.Add(new SchemaItem
+      {
+        Route = route,
+        HandlerType = typeof(TMessageHandler),
+        MessageType = typeof(TMessage)
+      });
+
+      return this;
+    }
+
     public Schema BuildSchema() => new Schema
     {
-      Special = new SchemaPart { Items = _specialItems.ToArray() },
+      RootPart = new SchemaPart { Items = _rootItems.ToArray() },
       Parts = _hubBuilders.Select(builder => builder.Build()).ToArray()
     };
   }

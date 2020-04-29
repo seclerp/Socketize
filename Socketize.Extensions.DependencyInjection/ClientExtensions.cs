@@ -74,7 +74,7 @@ namespace Socketize.Extensions.DependencyInjection
 
     private static void RegisterHandlers(Schema schema, IServiceCollection services)
     {
-      foreach (var item in schema.Special.Items)
+      foreach (var item in schema.RootPart.Items)
       {
         services.AddTransient(item.HandlerType);
       }

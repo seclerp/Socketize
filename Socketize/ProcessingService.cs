@@ -20,7 +20,12 @@ namespace Socketize
     public ProcessingService(Schema schema, IMessageHandlerFactory factory)
     {
       _factory = factory;
-      var allSchemaItems = schema.Special.Items.Union(schema.Parts.SelectMany(part => part.Items)).ToDictionary(item => item.Route, item => item);
+      var allSchemaItems =
+        schema.RootPart.Items
+          .Union(schema.Parts
+            .SelectMany(part => part.Items))
+          .ToDictionary(item => item.Route, item => item);
+
       _handlersMethodInfo = CreateMessageHandlersMethodInfo(allSchemaItems);
       _handlers = CreateMessageHandlers(allSchemaItems);
     }

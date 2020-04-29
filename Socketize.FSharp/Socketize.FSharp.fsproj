@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <PackageId>Socketize.FSharp</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>FreeParticle</Authors>
+        <Company>Secretive Leprechaun</Company>
+        <PackageTags>udp;networking</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="FuncSchema.fs" />
+        <Compile Include="FuncProcessingService.fs" />
+        <Compile Include="PeerExtensions.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Socketize\Socketize.csproj" />
+    </ItemGroup>
+
+</Project>

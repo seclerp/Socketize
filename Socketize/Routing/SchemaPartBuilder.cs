@@ -8,7 +8,7 @@ namespace Socketize.Routing
   {
     private readonly string _baseRoute;
     private readonly SchemaBuilder _parentBuilder;
-    private IList<SchemaItem> _intermediateItems;
+    private readonly IList<SchemaItem> _intermediateItems;
 
     public SchemaPartBuilder(string baseRoute, SchemaBuilder parentBuilder)
     {
