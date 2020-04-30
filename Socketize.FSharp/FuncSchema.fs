@@ -1,6 +1,7 @@
 ﻿namespace Socketize.FSharp
 
 open Socketize
+open Socketize.Routing
 
 type MessageHandler = Context -> byte[] option -> unit
 
@@ -14,19 +15,25 @@ type Hub = {
     subRoutes: Route list
 }
 
-type FuncSchema = {
-    routes: Route list
-    hubs: Hub list
-}
+type FuncSchema = FuncSchema of Route list
 
 module FuncSchemaBuilder =
     type SchemaPart =
         | Hub of Hub
         | Route of Route
 
+    let combineRoutes =
+        sprintf "%s/%s"
+
     let route (route: string) (handler: MessageHandler) =
         { route = route; handler = handler }
         |> SchemaPart.Route
+
+    let onConnect (handler: MessageHandler) =
+        route SpecialRouteNames.ConnectRoute handler
+
+    let onDisconnect (handler: MessageHandler) =
+        route SpecialRouteNames.DisconnectRoute handler
 
     let subRoute (route: string) (handler: MessageHandler) =
         { route = route; handler = handler }
@@ -36,14 +43,17 @@ module FuncSchemaBuilder =
         |> SchemaPart.Hub
 
     let schema (parts: SchemaPart list) =
-        let initialState : Hub seq * Route seq = Seq.empty, Seq.empty
-        let folder (hubs, routes) current =
+        let initialState = Seq.empty<Route>
+        let folder routes current =
             match current with
-            | Hub hub -> (seq { yield! hubs; yield hub }, routes)
-            | Route route -> (hubs, seq { yield! routes; yield route })
+            | Hub hub ->
+                let resolvedSubRoutes =
+                    hub.subRoutes
+                    |> Seq.map (fun route -> { route with route = combineRoutes hub.route route.route })
+                seq { yield! routes; yield! resolvedSubRoutes }
+            | Route route -> seq { yield! routes; yield route }
 
-        let (hubs, routes) = parts |> List.fold folder initialState
-        {
-            hubs = hubs |> List.ofSeq
-            routes = routes |> List.ofSeq
-        }
+        parts
+        |> List.fold folder initialState
+        |> List.ofSeq
+        |> FuncSchema

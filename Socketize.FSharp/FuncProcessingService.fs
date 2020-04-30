@@ -1,25 +1,18 @@
 ﻿namespace Socketize.FSharp
 
 open Lidgren.Network
+
 open Socketize
 open Socketize.Exceptions
 open Socketize.Routing
 open Socketize.FSharp
 
 type FuncProcessingService(schema: FuncSchema) =
-    let combineRoutes =
-        sprintf "%s/%s"
-
+    let (FuncSchema schema) = schema
     let handlers =
-        seq {
-            for route in schema.routes do
-                yield route.route, route.handler
-
-            for hub in schema.hubs do
-                for route in hub.subRoutes do
-                    let fullRoute = combineRoutes hub.route route.route
-                    yield fullRoute, route.handler
-        } |> dict
+        schema
+        |> List.map (fun route -> route.route, route.handler)
+        |> dict
 
     let processMessage (route: string) (ctx: Context) (dtoRaw: byte[] option) : bool =
         if handlers.ContainsKey(route) |> not then
