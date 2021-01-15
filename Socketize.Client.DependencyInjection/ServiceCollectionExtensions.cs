@@ -34,6 +34,19 @@ namespace Socketize.Client.DependencyInjection
             return services;
         }
 
+        /// <summary>
+        /// Adds Socketize client to dependency injection container.
+        /// </summary>
+        /// <param name="services">Instance of <see cref="IServiceCollection"/>.</param>
+        /// <param name="options">Server configuration options instance.</param>
+        /// <returns>Configured instance of <see cref="IServiceCollection"/>.</returns>
+        public static IServiceCollection AddSocketizeClient(
+            this IServiceCollection services,
+            ClientOptions options)
+        {
+            return AddSocketizeClient(services, _ => _, options);
+        }
+
         private static void AddSocketizeClientInternal(IServiceCollection services, ClientOptions options)
         {
             RegisterCommonServices(services, options);
