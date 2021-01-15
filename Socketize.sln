@@ -1,10 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize", "Socketize\Socketize.csproj", "{BA6E2769-A5A4-4FEA-B024-BD1F45330928}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.DependencyInjection", "Socketize.DependencyInjection\Socketize.DependencyInjection.csproj", "{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Extensions.DependencyInjection", "Socketize.Extensions.DependencyInjection\Socketize.Extensions.DependencyInjection.csproj", "{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Server.AspNetCore", "Socketize.Server.AspNetCore\Socketize.Server.AspNetCore.csproj", "{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Extensions.AspNetCore.Hosting", "Socketize.Extensions.AspNetCore.Hosting\Socketize.Extensions.AspNetCore.Hosting.csproj", "{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Tests", "Socketize.Tests\Socketize.Tests.csproj", "{4D09346B-6854-4983-9F20-F7A7A0AF5C39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Core", "Socketize.Core\Socketize.Core.csproj", "{3284BCC2-7717-418C-946D-E4BCFF3ACD07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Client", "Socketize.Client\Socketize.Client.csproj", "{976BD6D4-3921-44A3-9BE6-80F0E97940FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Server", "Socketize.Server\Socketize.Server.csproj", "{173DF3DC-9FCD-4BD2-92D0-54894C87BFBE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{C1C3AF25-7EE8-41E0-A8BE-4309ED473A8C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B408EF6C-CB79-442F-AF85-8938DA3A317B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{9FB7F623-5FBE-4C37-8FBC-3FC5A3F4B011}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Client.DependencyInjection", "Socketize.Client.DependencyInjection\Socketize.Client.DependencyInjection.csproj", "{3FD24682-EB34-4D8D-AD8C-AB06A0D7F992}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketize.Server.DependencyInjection", "Socketize.Server.DependencyInjection\Socketize.Server.DependencyInjection.csproj", "{A3A0D9D4-D7D7-4662-A581-69D1BEDF7689}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,10 +28,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA6E2769-A5A4-4FEA-B024-BD1F45330928}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3FDB89F-9FAC-4103-A17A-E0B0E717E15A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -24,5 +36,37 @@ Global
 		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D09346B-6854-4983-9F20-F7A7A0AF5C39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D09346B-6854-4983-9F20-F7A7A0AF5C39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D09346B-6854-4983-9F20-F7A7A0AF5C39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D09346B-6854-4983-9F20-F7A7A0AF5C39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3284BCC2-7717-418C-946D-E4BCFF3ACD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3284BCC2-7717-418C-946D-E4BCFF3ACD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3284BCC2-7717-418C-946D-E4BCFF3ACD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3284BCC2-7717-418C-946D-E4BCFF3ACD07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976BD6D4-3921-44A3-9BE6-80F0E97940FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976BD6D4-3921-44A3-9BE6-80F0E97940FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976BD6D4-3921-44A3-9BE6-80F0E97940FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976BD6D4-3921-44A3-9BE6-80F0E97940FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{173DF3DC-9FCD-4BD2-92D0-54894C87BFBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{173DF3DC-9FCD-4BD2-92D0-54894C87BFBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{173DF3DC-9FCD-4BD2-92D0-54894C87BFBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{173DF3DC-9FCD-4BD2-92D0-54894C87BFBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FD24682-EB34-4D8D-AD8C-AB06A0D7F992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FD24682-EB34-4D8D-AD8C-AB06A0D7F992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FD24682-EB34-4D8D-AD8C-AB06A0D7F992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FD24682-EB34-4D8D-AD8C-AB06A0D7F992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3A0D9D4-D7D7-4662-A581-69D1BEDF7689}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3A0D9D4-D7D7-4662-A581-69D1BEDF7689}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3A0D9D4-D7D7-4662-A581-69D1BEDF7689}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3A0D9D4-D7D7-4662-A581-69D1BEDF7689}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4D09346B-6854-4983-9F20-F7A7A0AF5C39} = {B408EF6C-CB79-442F-AF85-8938DA3A317B}
+		{976BD6D4-3921-44A3-9BE6-80F0E97940FF} = {C1C3AF25-7EE8-41E0-A8BE-4309ED473A8C}
+		{173DF3DC-9FCD-4BD2-92D0-54894C87BFBE} = {9FB7F623-5FBE-4C37-8FBC-3FC5A3F4B011}
+		{3FD24682-EB34-4D8D-AD8C-AB06A0D7F992} = {C1C3AF25-7EE8-41E0-A8BE-4309ED473A8C}
+		{A3A0D9D4-D7D7-4662-A581-69D1BEDF7689} = {9FB7F623-5FBE-4C37-8FBC-3FC5A3F4B011}
+		{BA1FA164-77F1-49B6-A0DC-439FCB5EEAEE} = {9FB7F623-5FBE-4C37-8FBC-3FC5A3F4B011}
 	EndGlobalSection
 EndGlobal

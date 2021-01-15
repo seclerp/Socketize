@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <PackageId>Socketize.Server.AspNetCore</PackageId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Socketize.Server.DependencyInjection\Socketize.Server.DependencyInjection.csproj" />
+      <ProjectReference Include="..\Socketize.Server\Socketize.Server.csproj" />
+    </ItemGroup>
+
+</Project>

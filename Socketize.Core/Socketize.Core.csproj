@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <PackageId>Socketize.Core</PackageId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Lidgren.Network.Core2" Version="1.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+        <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+        <PackageReference Include="ZeroFormatter" Version="1.6.4" />
+    </ItemGroup>
+    
+</Project>
