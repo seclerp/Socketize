@@ -47,6 +47,22 @@ namespace Socketize.Core.Routing
         }
 
         /// <inheritdoc />
+        public SchemaBuilder Route(string route, Action<ConnectionContext> handlerDelegate)
+        {
+            _rootHubBuilder.Route(route, handlerDelegate);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaBuilder Route<TMessage>(string route, Action<ConnectionContext, TMessage> handlerDelegate)
+        {
+            _rootHubBuilder.Route(route, handlerDelegate);
+
+            return this;
+        }
+
+        /// <inheritdoc />
         public SchemaBuilder Hub(string hubRoute, Func<SchemaHubBuilder, SchemaHubBuilder> hubConfiguration)
         {
             _rootHubBuilder.Hub(hubRoute, hubConfiguration);

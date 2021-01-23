@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Socketize.Core;
 using Socketize.Core.Abstractions;
+using Socketize.Core.Enums;
 using Socketize.Core.Extensions;
 using Socketize.Core.Routing;
 using Xunit;
@@ -19,6 +20,10 @@ namespace Socketize.Tests
     /// </summary>
     public class SchemaBuilderTests
     {
+        private static Action<ConnectionContext> DummyParameterlessDelegateHandler = context => { };
+
+        private static Action<ConnectionContext, object> DummyDelegateHandler = (context, obj) => { };
+
         [Fact]
         public void SchemaBuilder_WithSingleRouteInsideHub_ShouldReturnValidSchema()
         {
@@ -29,14 +34,54 @@ namespace Socketize.Tests
 
             var expected = new[]
             {
-                new SchemaItem("exampleHub/exampleRoute", typeof(DummyMessageHandler), default),
+                new SchemaItem("exampleHub/exampleRoute", typeof(DummyMessageHandler), default, HandlerInstanceKind.Class),
             };
 
             // Act
             var resultingItems = schemaBuilder.Build();
 
             // Assert
-            Assert.Equal(resultingItems, expected, new SchemaItemsComparer());
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
+        [Fact]
+        public void SchemaBuilder_WithSingleDelegateRouteInsideHub_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .Route("exampleRoute", DummyParameterlessDelegateHandler));
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/exampleRoute", DummyParameterlessDelegateHandler.Method, default, HandlerInstanceKind.Delegate),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
+        [Fact]
+        public void SchemaBuilder_WithSingleDelegateWithParametersRouteInsideHub_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .Route("exampleRoute", DummyDelegateHandler));
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/exampleRoute", DummyDelegateHandler.Method, typeof(object), HandlerInstanceKind.Delegate),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
         }
 
         [Fact]
@@ -52,7 +97,7 @@ namespace Socketize.Tests
             var resultingItems = schemaBuilder.Build();
 
             // Assert
-            Assert.Equal(resultingItems, expected, new SchemaItemsComparer());
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
         }
 
         [Fact]
@@ -66,14 +111,14 @@ namespace Socketize.Tests
 
             var expected = new[]
             {
-                new SchemaItem("exampleHub/innerExampleHub/exampleRoute", typeof(DummyMessageHandler), default),
+                new SchemaItem("exampleHub/innerExampleHub/exampleRoute", typeof(DummyMessageHandler), default, HandlerInstanceKind.Class),
             };
 
             // Act
             var resultingItems = schemaBuilder.Build();
 
             // Assert
-            Assert.Equal(resultingItems, expected, new SchemaItemsComparer());
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
         }
 
         [Fact]
@@ -88,16 +133,16 @@ namespace Socketize.Tests
 
             var expected = new[]
             {
-                new SchemaItem("exampleHub/exampleRoute", typeof(DummyMessageHandler), default),
-                new SchemaItem(SpecialRouteNames.ConnectRoute, typeof(DummyMessageHandler), default),
-                new SchemaItem(SpecialRouteNames.DisconnectRoute, typeof(DummyMessageHandler), default),
+                new SchemaItem("exampleHub/exampleRoute", typeof(DummyMessageHandler), default, HandlerInstanceKind.Class),
+                new SchemaItem(SpecialRouteNames.ConnectRoute, typeof(DummyMessageHandler), default, HandlerInstanceKind.Class),
+                new SchemaItem(SpecialRouteNames.DisconnectRoute, typeof(DummyMessageHandler), default, HandlerInstanceKind.Class),
             };
 
             // Act
             var resultingItems = schemaBuilder.Build();
 
             // Assert
-            Assert.Equal(resultingItems, expected, new SchemaItemsComparer());
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
         }
 
         private class DummyMessageHandler : IMessageHandler
@@ -107,7 +152,7 @@ namespace Socketize.Tests
             }
         }
 
-        private class SchemaItemsComparer : IEqualityComparer<SchemaItem>
+        private class SchemaItemsUniversalComparer : IEqualityComparer<SchemaItem>
         {
             public bool Equals(SchemaItem x, SchemaItem y)
             {
@@ -131,12 +176,12 @@ namespace Socketize.Tests
                     return false;
                 }
 
-                return x.Route == y.Route && x.HandlerType == y.HandlerType && x.MessageType == y.MessageType;
+                return x.Route == y.Route && x.Handler == y.Handler && x.MessageType == y.MessageType;
             }
 
             public int GetHashCode(SchemaItem obj)
             {
-                return HashCode.Combine(obj.Route, obj.HandlerType, obj.MessageType);
+                return HashCode.Combine(obj.Route, obj.Handler, obj.MessageType);
             }
         }
     }

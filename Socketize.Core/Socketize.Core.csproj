@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <PackageId>Socketize.Core</PackageId>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

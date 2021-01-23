@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Socketize.Core.Abstractions;
+using Socketize.Core.Enums;
 using Socketize.Core.Extensions;
 using Socketize.Core.Routing.Abstractions;
 
@@ -32,7 +33,7 @@ namespace Socketize.Core.Routing
             where TMessageHandler : IMessageHandler
         {
             var combinedRoute = _baseRoute.CombineWith(route);
-            var newSchemaItem = new SchemaItem(combinedRoute, typeof(TMessageHandler), null);
+            var newSchemaItem = new SchemaItem(combinedRoute, typeof(TMessageHandler), null, HandlerInstanceKind.Class);
             _intermediateItems.Add(newSchemaItem);
 
             return this;
@@ -43,7 +44,27 @@ namespace Socketize.Core.Routing
             where TMessageHandler : IMessageHandler<TMessage>
         {
             var combinedRoute = _baseRoute.CombineWith(route);
-            var newSchemaItem = new SchemaItem(combinedRoute, typeof(TMessageHandler), typeof(TMessage));
+            var newSchemaItem = new SchemaItem(combinedRoute, typeof(TMessageHandler), typeof(TMessage), HandlerInstanceKind.Class);
+            _intermediateItems.Add(newSchemaItem);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaHubBuilder Route(string route, Action<ConnectionContext> handlerDelegate)
+        {
+            var combinedRoute = _baseRoute.CombineWith(route);
+            var newSchemaItem = new SchemaItem(combinedRoute, handlerDelegate.Method, null, HandlerInstanceKind.Delegate);
+            _intermediateItems.Add(newSchemaItem);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaHubBuilder Route<TMessage>(string route, Action<ConnectionContext, TMessage> handlerDelegate)
+        {
+            var combinedRoute = _baseRoute.CombineWith(route);
+            var newSchemaItem = new SchemaItem(combinedRoute, handlerDelegate.Method, typeof(TMessage), HandlerInstanceKind.Delegate);
             _intermediateItems.Add(newSchemaItem);
 
             return this;

@@ -1,4 +1,5 @@
 using System;
+using Socketize.Core.Enums;
 
 namespace Socketize.Core.Routing
 {
@@ -11,13 +12,15 @@ namespace Socketize.Core.Routing
         /// Initializes a new instance of the <see cref="SchemaItem"/> class.
         /// </summary>
         /// <param name="route">String that represents route to a handler.</param>
-        /// <param name="handlerType">Type that represents handler that will handle message.</param>
+        /// <param name="handler">Object that represents handler instance.</param>
         /// <param name="messageType">Type that represents message payload.</param>
-        public SchemaItem(string route, Type handlerType, Type messageType)
+        /// <param name="kind">Kind of a handler instance.</param>
+        public SchemaItem(string route, object handler, Type messageType, HandlerInstanceKind kind)
         {
             Route = route;
-            HandlerType = handlerType;
+            Handler = handler;
             MessageType = messageType;
+            Kind = kind;
         }
 
         /// <summary>
@@ -28,12 +31,17 @@ namespace Socketize.Core.Routing
         /// <summary>
         /// Gets type that represents handler that will handle message.
         /// </summary>
-        public Type HandlerType { get; }
+        public object Handler { get; }
 
         /// <summary>
         /// Gets type that represents message payload.
         /// Returns null if message has no payload.
         /// </summary>
         public Type MessageType { get; }
+
+        /// <summary>
+        /// Gets kind of message handler object.
+        /// </summary>
+        public HandlerInstanceKind Kind { get; }
     }
 }

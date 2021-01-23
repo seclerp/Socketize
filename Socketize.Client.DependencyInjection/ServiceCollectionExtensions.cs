@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Socketize.Client.Configuration;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Routing;
-using Socketize.Core.Services;
 using Socketize.Core.Services.Abstractions;
 using Socketize.DependencyInjection;
 
@@ -28,8 +27,14 @@ namespace Socketize.Client.DependencyInjection
             Func<SchemaBuilder, SchemaBuilder> schemaConfig,
             ClientOptions options)
         {
-            services.AddSingleton(serviceProvider => CreateSchema(schemaConfig));
-            AddSocketizeClientInternal(services, options);
+            var schemaBuilder = SchemaBuilder.Create();
+            var schema = schemaConfig(schemaBuilder).Build();
+
+            services.AddSocketizeCommons(schema);
+            services.AddSingleton<IPeer, ClientPeer>(serviceProvider => new ClientPeer(
+                serviceProvider.GetService<IProcessingService>(),
+                serviceProvider.GetService<ILogger<ClientPeer>>(),
+                options));
 
             return services;
         }
@@ -45,38 +50,6 @@ namespace Socketize.Client.DependencyInjection
             ClientOptions options)
         {
             return AddSocketizeClient(services, _ => _, options);
-        }
-
-        private static void AddSocketizeClientInternal(IServiceCollection services, ClientOptions options)
-        {
-            RegisterCommonServices(services, options);
-            RegisterHandlers(services.BuildServiceProvider().GetService<Schema>(), services);
-        }
-
-        private static void RegisterCommonServices(this IServiceCollection services, ClientOptions options)
-        {
-            services.AddSingleton<IMessageHandlerFactory>(
-                serviceProvider => new InjectedMessageHandlerFactory(serviceProvider));
-            services.AddTransient<IProcessingService, ProcessingService>();
-            services.AddSingleton<IPeer, ClientPeer>(serviceProvider => new ClientPeer(
-                serviceProvider.GetService<IProcessingService>(),
-                serviceProvider.GetService<ILogger<ClientPeer>>(),
-                options));
-        }
-
-        private static Schema CreateSchema(Func<SchemaBuilder, SchemaBuilder> builderAction)
-        {
-            var schemaBuilder = SchemaBuilder.Create();
-
-            return builderAction(schemaBuilder).Build();
-        }
-
-        private static void RegisterHandlers(Schema schema, IServiceCollection services)
-        {
-            foreach (var item in schema)
-            {
-                services.AddTransient(item.HandlerType);
-            }
         }
     }
 }
