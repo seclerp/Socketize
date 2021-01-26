@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Enums;
 using Socketize.Core.Routing;
@@ -17,7 +18,7 @@ namespace Socketize.Core.Services
     {
         private readonly IMessageHandlerFactory _factory;
         private IDictionary<string, MethodInfo> _classHandlersMethodInfo;
-        private IDictionary<string, Action<ConnectionContext, byte[]>> _classHandlers;
+        private IDictionary<string, Func<ConnectionContext, byte[], Task>> _classHandlers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageHandlersManager"/> class.
@@ -32,9 +33,9 @@ namespace Socketize.Core.Services
         }
 
         /// <inheritdoc />
-        public void Invoke(string route, ConnectionContext context, byte[] dtoRaw)
+        public Task Invoke(string route, ConnectionContext context, byte[] dtoRaw)
         {
-            _classHandlers[route].Invoke(context, dtoRaw);
+            return _classHandlers[route].Invoke(context, dtoRaw);
         }
 
         /// <inheritdoc />
@@ -43,7 +44,7 @@ namespace Socketize.Core.Services
             return _classHandlers.ContainsKey(route);
         }
 
-        private static bool IsValidHandler(MethodInfo method, Type messageType)
+        private static bool IsHandlerValid(MethodInfo method, Type messageType)
         {
             var parameters = method.GetParameters();
             if (messageType is null
@@ -63,26 +64,7 @@ namespace Socketize.Core.Services
             return false;
         }
 
-        private IDictionary<string, Action<ConnectionContext, byte[]>> CreateMessageHandlers(
-            IDictionary<string, SchemaItem> schemaItems)
-        {
-            return schemaItems.ToDictionary(kv => kv.Key, kv =>
-                kv.Value.Kind switch
-                {
-                    HandlerInstanceKind.Class =>
-                        new Action<ConnectionContext, byte[]>((context, dtoRaw) =>
-                        {
-                            var instance = _factory.Get(kv.Value.Handler as Type);
-                            InvokeMessageHandler(kv.Value, instance, context, dtoRaw);
-                        }),
-                    HandlerInstanceKind.Delegate =>
-                        new Action<ConnectionContext, byte[]>((context, dtoRaw) =>
-                            InvokeMessageHandler(kv.Value, default, context, dtoRaw)),
-                    _ => default,
-                });
-        }
-
-        private void InvokeMessageHandler(SchemaItem item, object instance, ConnectionContext context, byte[] dtoRaw)
+        private static object[] PrepareArguments(SchemaItem item, ConnectionContext context, byte[] rawDto)
         {
             object[] args;
             if (item.MessageType is null)
@@ -91,11 +73,83 @@ namespace Socketize.Core.Services
             }
             else
             {
-                var dto = ZeroFormatterSerializer.NonGeneric.Deserialize(item.MessageType, dtoRaw);
+                var dto = ZeroFormatterSerializer.NonGeneric.Deserialize(item.MessageType, rawDto);
                 args = new[] { context, dto };
             }
 
+            return args;
+        }
+
+        private IDictionary<string, Func<ConnectionContext, byte[], Task>> CreateMessageHandlers(
+            IDictionary<string, SchemaItem> schemaItems)
+        {
+            return schemaItems.ToDictionary(kv => kv.Key, kv =>
+            {
+                var item = kv.Value;
+                switch (kv.Value.Kind)
+                {
+                    case HandlerInstanceKind.Class:
+                        var classReturnType = _classHandlersMethodInfo[item.Route].ReturnType;
+                        return CreateClassMessageHandler(item, classReturnType);
+                    case HandlerInstanceKind.Delegate:
+                        var delegateReturnType = _classHandlersMethodInfo[kv.Value.Route].ReturnType;
+                        return CreateDelegateMessageHandler(item, delegateReturnType);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            });
+        }
+
+        private Func<ConnectionContext, byte[], Task> CreateClassMessageHandler(SchemaItem item, Type handlerReturnType)
+        {
+            return handlerReturnType switch
+            {
+                var type when type == typeof(Task) =>
+                    (context, dtoRaw) =>
+                    {
+                        var instance = _factory.Get(item.Handler as Type);
+                        return InvokeAsyncMessageHandler(item, instance, context, dtoRaw);
+                    },
+                var type when type == typeof(void) =>
+                    (context, dtoRaw) =>
+                    {
+                        var instance = _factory.Get(item.Handler as Type);
+                        InvokeMessageHandler(item, instance, context, dtoRaw);
+                        return Task.CompletedTask;
+                    },
+                _ => throw new ArgumentOutOfRangeException(),
+            };
+        }
+
+        private Func<ConnectionContext, byte[], Task> CreateDelegateMessageHandler(SchemaItem item, Type handlerReturnType)
+        {
+            return handlerReturnType switch
+            {
+                var type when type == typeof(Task) =>
+                    (context, dtoRaw) =>
+                        InvokeAsyncMessageHandler(item, default, context, dtoRaw),
+                var type when type == typeof(void) =>
+                    (context, dtoRaw) =>
+                    {
+                        InvokeAsyncMessageHandler(item, default, context, dtoRaw);
+                        return Task.CompletedTask;
+                    },
+                _ => throw new ArgumentOutOfRangeException(),
+            };
+        }
+
+        private void InvokeMessageHandler(SchemaItem item, object instance, ConnectionContext context, byte[] dtoRaw)
+        {
+            var args = PrepareArguments(item, context, dtoRaw);
+
             _classHandlersMethodInfo[item.Route]?.Invoke(instance, args);
+        }
+
+        private Task InvokeAsyncMessageHandler(SchemaItem item, object instance, ConnectionContext context, byte[] dtoRaw)
+        {
+            var args = PrepareArguments(item, context, dtoRaw);
+
+            return (Task)_classHandlersMethodInfo[item.Route]?.Invoke(instance, args);
         }
 
         private IDictionary<string, MethodInfo> CreateMessageHandlersMethodInfo(
@@ -104,7 +158,7 @@ namespace Socketize.Core.Services
                 ((Type)kv.Value.Handler)
                     .GetMethods()
                     .Where(info => info.Name is "Handle")
-                    .FirstOrDefault(methodInfo => IsValidHandler(methodInfo, kv.Value.MessageType)));
+                    .FirstOrDefault(methodInfo => IsHandlerValid(methodInfo, kv.Value.MessageType)));
 
         private void PopulateMethodsInfo(Schema schema)
         {

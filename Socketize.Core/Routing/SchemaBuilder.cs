@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Routing.Abstractions;
 
@@ -8,7 +9,10 @@ namespace Socketize.Core.Routing
     /// <summary>
     /// Root schema builder implementation.
     /// </summary>
-    public class SchemaBuilder : IBuilder<Schema>, ISchemaBuilder<SchemaBuilder>
+    public class SchemaBuilder : IBuilder<Schema>,
+        IRoutesBuilder<SchemaBuilder>,
+        IAsyncRoutesBuilder<SchemaBuilder>,
+        IHubBuilder<SchemaBuilder>
     {
         private readonly SchemaHubBuilder _rootHubBuilder;
 
@@ -58,6 +62,40 @@ namespace Socketize.Core.Routing
         public SchemaBuilder Route<TMessage>(string route, Action<ConnectionContext, TMessage> handlerDelegate)
         {
             _rootHubBuilder.Route(route, handlerDelegate);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaBuilder AsyncRoute<TMessageHandler>(string route)
+            where TMessageHandler : IAsyncMessageHandler
+        {
+            _rootHubBuilder.AsyncRoute<TMessageHandler>(route);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaBuilder AsyncRoute<TMessage, TMessageHandler>(string route)
+            where TMessageHandler : IAsyncMessageHandler<TMessage>
+        {
+            _rootHubBuilder.AsyncRoute<TMessage, TMessageHandler>(route);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaBuilder AsyncRoute(string route, Func<ConnectionContext, Task> handlerDelegate)
+        {
+            _rootHubBuilder.AsyncRoute(route, handlerDelegate);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaBuilder AsyncRoute<TMessage>(string route, Func<ConnectionContext, TMessage, Task> handlerDelegate)
+        {
+            _rootHubBuilder.AsyncRoute(route, handlerDelegate);
 
             return this;
         }

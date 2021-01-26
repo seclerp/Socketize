@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Socketize.Core;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Enums;
@@ -23,6 +24,10 @@ namespace Socketize.Tests
         private static Action<ConnectionContext> dummyParameterlessDelegateHandler = context => { };
 
         private static Action<ConnectionContext, object> dummyDelegateHandler = (context, obj) => { };
+
+        private static Func<ConnectionContext, Task> dummyParameterlessAsyncDelegateHandler = context => Task.CompletedTask;
+
+        private static Func<ConnectionContext, object, Task> dummyAsyncDelegateHandler = (context, obj) => Task.CompletedTask;
 
         [Fact]
         public void SchemaBuilder_WithSingleRouteInsideHub_ShouldReturnValidSchema()
@@ -145,10 +150,123 @@ namespace Socketize.Tests
             Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
         }
 
+        [Fact]
+        public void SchemaBuilder_WithSingleAsyncRouteInsideHub_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .AsyncRoute<DummyAsyncMessageHandler>("exampleRoute"));
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/exampleRoute", typeof(DummyAsyncMessageHandler), default, HandlerInstanceKind.Class),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
+        [Fact]
+        public void SchemaBuilder_WithSingleAsyncDelegateRouteInsideHub_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .AsyncRoute("exampleRoute", dummyParameterlessAsyncDelegateHandler));
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/exampleRoute", dummyParameterlessAsyncDelegateHandler.Method, default, HandlerInstanceKind.Delegate),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
+        [Fact]
+        public void SchemaBuilder_WithSingleAsyncDelegateWithParametersRouteInsideHub_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .AsyncRoute("exampleRoute", dummyAsyncDelegateHandler));
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/exampleRoute", dummyAsyncDelegateHandler.Method, typeof(object), HandlerInstanceKind.Delegate),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
+        [Fact]
+        public void SchemaBuilder_WithAsyncRouteInsideHubInsideOtherHub_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .Hub("innerExampleHub", innerHub => innerHub
+                        .AsyncRoute<DummyAsyncMessageHandler>("exampleRoute")));
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/innerExampleHub/exampleRoute", typeof(DummyAsyncMessageHandler), default, HandlerInstanceKind.Class),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
+        [Fact]
+        public void SchemaBuilder_SimpleAsyncRouteInsideHubWithSpecialRoutesDefined_ShouldReturnValidSchema()
+        {
+            // Arrange
+            var schemaBuilder = SchemaBuilder.Create()
+                .Hub("exampleHub", hub => hub
+                    .AsyncRoute<DummyAsyncMessageHandler>("exampleRoute"))
+                .OnConnectAsync<DummyAsyncMessageHandler>()
+                .OnDisconnectAsync<DummyAsyncMessageHandler>();
+
+            var expected = new[]
+            {
+                new SchemaItem("exampleHub/exampleRoute", typeof(DummyAsyncMessageHandler), default, HandlerInstanceKind.Class),
+                new SchemaItem(SpecialRouteNames.ConnectRoute, typeof(DummyAsyncMessageHandler), default, HandlerInstanceKind.Class),
+                new SchemaItem(SpecialRouteNames.DisconnectRoute, typeof(DummyAsyncMessageHandler), default, HandlerInstanceKind.Class),
+            };
+
+            // Act
+            var resultingItems = schemaBuilder.Build();
+
+            // Assert
+            Assert.Equal(resultingItems, expected, new SchemaItemsUniversalComparer());
+        }
+
         private class DummyMessageHandler : IMessageHandler
         {
             public void Handle(ConnectionContext connectionContext)
             {
+            }
+        }
+
+        private class DummyAsyncMessageHandler : IAsyncMessageHandler
+        {
+            public async Task Handle(ConnectionContext connectionContext)
+            {
+                await Task.CompletedTask;
             }
         }
 

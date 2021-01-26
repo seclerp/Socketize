@@ -23,6 +23,20 @@ namespace Socketize.Core.Extensions
         }
 
         /// <summary>
+        /// Adds asynchronous message handler for Connected event, that fires when new peer is connected to this peer.
+        /// </summary>
+        /// <param name="builder">Schema builder instance.</param>
+        /// <typeparam name="TMessageHandler">Type of message handler.</typeparam>
+        /// <returns>Configured schema builder instance.</returns>
+        public static SchemaBuilder OnConnectAsync<TMessageHandler>(this SchemaBuilder builder)
+            where TMessageHandler : IAsyncMessageHandler
+        {
+            builder.AsyncRoute<TMessageHandler>(SpecialRouteNames.ConnectRoute);
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds message handler for Disconnected event, that fires when connected peer is disconnected from this peer.
         /// </summary>
         /// <param name="builder">Schema builder instance.</param>
@@ -32,6 +46,20 @@ namespace Socketize.Core.Extensions
             where TMessageHandler : IMessageHandler
         {
             builder.Route<TMessageHandler>(SpecialRouteNames.DisconnectRoute);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds asynchronous message handler for Disconnected event, that fires when connected peer is disconnected from this peer.
+        /// </summary>
+        /// <param name="builder">Schema builder instance.</param>
+        /// <typeparam name="TMessageHandler">Type of message handler.</typeparam>
+        /// <returns>Configured schema builder instance.</returns>
+        public static SchemaBuilder OnDisconnectAsync<TMessageHandler>(this SchemaBuilder builder)
+            where TMessageHandler : IAsyncMessageHandler
+        {
+            builder.AsyncRoute<TMessageHandler>(SpecialRouteNames.DisconnectRoute);
 
             return builder;
         }

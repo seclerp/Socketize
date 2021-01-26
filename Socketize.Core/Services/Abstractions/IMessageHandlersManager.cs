@@ -1,4 +1,6 @@
-﻿namespace Socketize.Core.Services.Abstractions
+﻿using System.Threading.Tasks;
+
+namespace Socketize.Core.Services.Abstractions
 {
     /// <summary>
     /// Abstraction that represents manager for message handlers.
@@ -11,7 +13,8 @@
         /// <param name="route">Route used to determine which handler to use.</param>
         /// <param name="context">Connection context instance.</param>
         /// <param name="dtoRaw">Raw DTO object containing byte array with information, could be null.</param>
-        void Invoke(string route, ConnectionContext context, byte[] dtoRaw);
+        /// <returns>Task representing handler processing.</returns>
+        Task Invoke(string route, ConnectionContext context, byte[] dtoRaw);
 
         /// <summary>
         /// Returns true if handler for given route exists, otherwise false.

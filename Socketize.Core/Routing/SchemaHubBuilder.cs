@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Enums;
 using Socketize.Core.Extensions;
@@ -10,7 +11,10 @@ namespace Socketize.Core.Routing
     /// <summary>
     /// Hub schema builder implementation.
     /// </summary>
-    public class SchemaHubBuilder : ISchemaBuilder<SchemaHubBuilder>, IBuilder<IEnumerable<SchemaItem>>
+    public class SchemaHubBuilder : IRoutesBuilder<SchemaHubBuilder>,
+        IBuilder<IEnumerable<SchemaItem>>,
+        IAsyncRoutesBuilder<SchemaHubBuilder>,
+        IHubBuilder<SchemaHubBuilder>
     {
         private readonly string _baseRoute;
         private readonly SchemaHubBuilder _parentHubBuilder;
@@ -32,9 +36,7 @@ namespace Socketize.Core.Routing
         public SchemaHubBuilder Route<TMessageHandler>(string route)
             where TMessageHandler : IMessageHandler
         {
-            var combinedRoute = _baseRoute.CombineWith(route);
-            var newSchemaItem = new SchemaItem(combinedRoute, typeof(TMessageHandler), null, HandlerInstanceKind.Class);
-            _intermediateItems.Add(newSchemaItem);
+            AddRoute(route, typeof(TMessageHandler), null, HandlerInstanceKind.Class);
 
             return this;
         }
@@ -43,9 +45,7 @@ namespace Socketize.Core.Routing
         public SchemaHubBuilder Route<TMessage, TMessageHandler>(string route)
             where TMessageHandler : IMessageHandler<TMessage>
         {
-            var combinedRoute = _baseRoute.CombineWith(route);
-            var newSchemaItem = new SchemaItem(combinedRoute, typeof(TMessageHandler), typeof(TMessage), HandlerInstanceKind.Class);
-            _intermediateItems.Add(newSchemaItem);
+            AddRoute(route, typeof(TMessageHandler), typeof(TMessage), HandlerInstanceKind.Class);
 
             return this;
         }
@@ -53,9 +53,7 @@ namespace Socketize.Core.Routing
         /// <inheritdoc />
         public SchemaHubBuilder Route(string route, Action<ConnectionContext> handlerDelegate)
         {
-            var combinedRoute = _baseRoute.CombineWith(route);
-            var newSchemaItem = new SchemaItem(combinedRoute, handlerDelegate.Method, null, HandlerInstanceKind.Delegate);
-            _intermediateItems.Add(newSchemaItem);
+            AddRoute(route, handlerDelegate.Method, null, HandlerInstanceKind.Delegate);
 
             return this;
         }
@@ -63,9 +61,41 @@ namespace Socketize.Core.Routing
         /// <inheritdoc />
         public SchemaHubBuilder Route<TMessage>(string route, Action<ConnectionContext, TMessage> handlerDelegate)
         {
-            var combinedRoute = _baseRoute.CombineWith(route);
-            var newSchemaItem = new SchemaItem(combinedRoute, handlerDelegate.Method, typeof(TMessage), HandlerInstanceKind.Delegate);
-            _intermediateItems.Add(newSchemaItem);
+            AddRoute(route, handlerDelegate.Method, typeof(TMessage), HandlerInstanceKind.Delegate);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaHubBuilder AsyncRoute<TMessageHandler>(string route)
+            where TMessageHandler : IAsyncMessageHandler
+        {
+            AddRoute(route, typeof(TMessageHandler), null, HandlerInstanceKind.Class);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaHubBuilder AsyncRoute<TMessage, TMessageHandler>(string route)
+            where TMessageHandler : IAsyncMessageHandler<TMessage>
+        {
+            AddRoute(route, typeof(TMessageHandler), typeof(TMessage), HandlerInstanceKind.Class);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaHubBuilder AsyncRoute(string route, Func<ConnectionContext, Task> handlerDelegate)
+        {
+            AddRoute(route, handlerDelegate.Method, null, HandlerInstanceKind.Delegate);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public SchemaHubBuilder AsyncRoute<TMessage>(string route, Func<ConnectionContext, TMessage, Task> handlerDelegate)
+        {
+            AddRoute(route, handlerDelegate.Method, typeof(TMessage), HandlerInstanceKind.Delegate);
 
             return this;
         }
@@ -87,5 +117,12 @@ namespace Socketize.Core.Routing
         /// <inheritdoc />
         public IEnumerable<SchemaItem> Build() =>
             _intermediateItems;
+
+        private void AddRoute(string route, object handler, Type messageType, HandlerInstanceKind kind)
+        {
+            var combinedRoute = _baseRoute.CombineWith(route);
+            var newSchemaItem = new SchemaItem(combinedRoute, handler, messageType, kind);
+            _intermediateItems.Add(newSchemaItem);
+        }
     }
 }
