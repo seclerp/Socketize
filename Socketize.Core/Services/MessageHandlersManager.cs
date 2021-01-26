@@ -131,7 +131,7 @@ namespace Socketize.Core.Services
                 var type when type == typeof(void) =>
                     (context, dtoRaw) =>
                     {
-                        InvokeAsyncMessageHandler(item, default, context, dtoRaw);
+                        InvokeMessageHandler(item, default, context, dtoRaw);
                         return Task.CompletedTask;
                     },
                 _ => throw new ArgumentOutOfRangeException(),
