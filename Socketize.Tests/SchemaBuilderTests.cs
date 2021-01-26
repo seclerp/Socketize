@@ -20,9 +20,9 @@ namespace Socketize.Tests
     /// </summary>
     public class SchemaBuilderTests
     {
-        private static Action<ConnectionContext> DummyParameterlessDelegateHandler = context => { };
+        private static Action<ConnectionContext> dummyParameterlessDelegateHandler = context => { };
 
-        private static Action<ConnectionContext, object> DummyDelegateHandler = (context, obj) => { };
+        private static Action<ConnectionContext, object> dummyDelegateHandler = (context, obj) => { };
 
         [Fact]
         public void SchemaBuilder_WithSingleRouteInsideHub_ShouldReturnValidSchema()
@@ -50,11 +50,11 @@ namespace Socketize.Tests
             // Arrange
             var schemaBuilder = SchemaBuilder.Create()
                 .Hub("exampleHub", hub => hub
-                    .Route("exampleRoute", DummyParameterlessDelegateHandler));
+                    .Route("exampleRoute", dummyParameterlessDelegateHandler));
 
             var expected = new[]
             {
-                new SchemaItem("exampleHub/exampleRoute", DummyParameterlessDelegateHandler.Method, default, HandlerInstanceKind.Delegate),
+                new SchemaItem("exampleHub/exampleRoute", dummyParameterlessDelegateHandler.Method, default, HandlerInstanceKind.Delegate),
             };
 
             // Act
@@ -70,11 +70,11 @@ namespace Socketize.Tests
             // Arrange
             var schemaBuilder = SchemaBuilder.Create()
                 .Hub("exampleHub", hub => hub
-                    .Route("exampleRoute", DummyDelegateHandler));
+                    .Route("exampleRoute", dummyDelegateHandler));
 
             var expected = new[]
             {
-                new SchemaItem("exampleHub/exampleRoute", DummyDelegateHandler.Method, typeof(object), HandlerInstanceKind.Delegate),
+                new SchemaItem("exampleHub/exampleRoute", dummyDelegateHandler.Method, typeof(object), HandlerInstanceKind.Delegate),
             };
 
             // Act

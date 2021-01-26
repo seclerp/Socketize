@@ -9,14 +9,15 @@ namespace Socketize.Core.Services
     /// </summary>
     public class ProcessingService : IProcessingService
     {
-        private readonly IMessageHandlersStorage _messageHandlersStorage;
+        private readonly IMessageHandlersManager _messageHandlersManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessingService"/> class.
         /// </summary>
-        public ProcessingService(IMessageHandlersStorage messageHandlersStorage)
+        /// <param name="messageHandlersManager">Manager for message handlers.</param>
+        public ProcessingService(IMessageHandlersManager messageHandlersManager)
         {
-            _messageHandlersStorage = messageHandlersStorage;
+            _messageHandlersManager = messageHandlersManager;
         }
 
         /// <inheritdoc />
@@ -34,9 +35,9 @@ namespace Socketize.Core.Services
 
         private bool TryProcessMessage(string route, ConnectionContext connectionContext, byte[] dtoRaw)
         {
-            if (_messageHandlersStorage.HasRoute(route))
+            if (_messageHandlersManager.RouteExists(route))
             {
-                _messageHandlersStorage.Invoke(route, connectionContext, dtoRaw);
+                _messageHandlersManager.Invoke(route, connectionContext, dtoRaw);
             }
 
             return true;

@@ -5,29 +5,40 @@ using System.Reflection;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Enums;
 using Socketize.Core.Routing;
+using Socketize.Core.Services.Abstractions;
 using ZeroFormatter;
 
 namespace Socketize.Core.Services
 {
-    public class MessageHandlersStorage : IMessageHandlersStorage
+    /// <summary>
+    /// Service that that represents manager for message handlers.
+    /// </summary>
+    public class MessageHandlersManager : IMessageHandlersManager
     {
         private readonly IMessageHandlerFactory _factory;
         private IDictionary<string, MethodInfo> _classHandlersMethodInfo;
         private IDictionary<string, Action<ConnectionContext, byte[]>> _classHandlers;
 
-        public MessageHandlersStorage(Schema schema, IMessageHandlerFactory factory)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageHandlersManager"/> class.
+        /// </summary>
+        /// <param name="schema">Schema instance.</param>
+        /// <param name="factory">Factory for message handlers.</param>
+        public MessageHandlersManager(Schema schema, IMessageHandlerFactory factory)
         {
             _factory = factory;
 
             PopulateMethodsInfo(schema);
         }
 
+        /// <inheritdoc />
         public void Invoke(string route, ConnectionContext context, byte[] dtoRaw)
         {
             _classHandlers[route].Invoke(context, dtoRaw);
         }
 
-        public bool HasRoute(string route)
+        /// <inheritdoc />
+        public bool RouteExists(string route)
         {
             return _classHandlers.ContainsKey(route);
         }
