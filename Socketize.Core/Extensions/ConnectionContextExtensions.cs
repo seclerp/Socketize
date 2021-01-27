@@ -18,7 +18,7 @@ namespace Socketize.Core.Extensions
         /// <returns>Message object ready to be populated and to be sent.</returns>
         public static NetOutgoingMessage NewMessage(this ConnectionContext connectionContext)
         {
-            return connectionContext.Connection.Peer.CreateMessage();
+            return connectionContext.CurrentPeer.LowLevelPeer.CreateMessage();
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Socketize.Core.Extensions
         /// <returns>Connection object to a connected remote endpoint.</returns>
         public static NetConnection GetConnection(this ConnectionContext connectionContext, IPEndPoint endpoint)
         {
-            return connectionContext.Connection.Peer.GetConnection(endpoint);
+            return connectionContext.CurrentPeer.LowLevelPeer.GetConnection(endpoint);
         }
 
         /// <summary>

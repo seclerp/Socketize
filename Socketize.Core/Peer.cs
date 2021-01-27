@@ -37,7 +37,7 @@ namespace Socketize.Core
 
         /// <inheritdoc />
         public ConnectionContext CreateRemoteContext(IPEndPoint target) =>
-            new ConnectionContext(LowLevelPeer.GetConnection(target));
+            new ConnectionContext(this, LowLevelPeer.GetConnection(target));
 
         /// <inheritdoc />
         public virtual void Start()
@@ -144,20 +144,20 @@ namespace Socketize.Core
 
         private void ProcessConnected(NetIncomingMessage message)
         {
-            _processingService.ProcessMessage(SpecialRouteNames.ConnectRoute, message, false);
+            _processingService.ProcessMessage(this, SpecialRouteNames.ConnectRoute, message, false, true);
             Logger.LogInformation($"'{message.SenderConnection.RemoteEndPoint}' connected");
         }
 
         private void ProcessDisconnected(NetIncomingMessage message)
         {
-            _processingService.ProcessMessage(SpecialRouteNames.DisconnectRoute, message, false);
+            _processingService.ProcessMessage(this, SpecialRouteNames.DisconnectRoute, message, false, true);
             Logger.LogInformation($"'{message.SenderConnection.RemoteEndPoint}' disconnected");
         }
 
         private void ProcessData(NetIncomingMessage message)
         {
             var route = message.ReadString();
-            _processingService.ProcessMessage(route, message);
+            _processingService.ProcessMessage(this, route, message);
             Logger.LogInformation($"Processed message for route '{route}'");
         }
     }

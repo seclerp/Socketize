@@ -30,10 +30,11 @@ namespace Socketize.Server.DependencyInjection
             var schema = schemaConfig(schemaBuilder).Build();
 
             services.AddSocketizeCommons(schema);
-            services.AddSingleton<IPeer, ServerPeer>(serviceProvider => new ServerPeer(
+            services.AddSingleton(serviceProvider => new ServerPeer(
                 serviceProvider.GetService<IProcessingService>(),
                 serviceProvider.GetService<ILogger<ServerPeer>>(),
                 options));
+            services.AddSingleton<IPeer, ServerPeer>(serviceProvider => serviceProvider.GetService<ServerPeer>());
 
             return services;
         }

@@ -28,6 +28,8 @@ namespace Socketize.Client
             _options = options;
         }
 
+        public ConnectionContext ServerContext { get; private set; }
+
         /// <inheritdoc />
         public override void Start()
         {
@@ -36,7 +38,9 @@ namespace Socketize.Client
             var approval = LowLevelPeer.CreateMessage();
             approval.Write("Approve me please, there might be token");
 
-            LowLevelPeer.Connect(_options.ServerHost, _options.ServerPort, approval);
+            var serverConnection = LowLevelPeer.Connect(_options.ServerHost, _options.ServerPort, approval);
+            ServerContext = new ConnectionContext(this, serverConnection);
+
             Logger.LogInformation($"Send connection approval to {_options.ServerHost}:{_options.ServerPort}");
         }
 

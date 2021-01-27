@@ -1,4 +1,5 @@
 ﻿using Lidgren.Network;
+using Socketize.Core.Abstractions;
 
 namespace Socketize.Core.Services.Abstractions
 {
@@ -13,6 +14,6 @@ namespace Socketize.Core.Services.Abstractions
         /// <param name="route">Route path.</param>
         /// <param name="message">Object that represents incoming message.</param>
         /// <param name="failWhenNoHandlers">If true, method throws exception if no matching handlers found.</param>
-        void ProcessMessage(string route, NetIncomingMessage message, bool failWhenNoHandlers = true);
+        void ProcessMessage(IPeer currentPeer, string route, NetIncomingMessage message, bool failWhenNoHandlers = true, bool ignoreContents = false);
     }
 }

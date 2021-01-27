@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lidgren.Network;
+using Socketize.Core.Abstractions;
 
 namespace Socketize.Core
 {
@@ -13,10 +14,13 @@ namespace Socketize.Core
         /// Initializes a new instance of the <see cref="ConnectionContext"/> class.
         /// </summary>
         /// <param name="connection">Remote paired connection object, representing connection between client and server.</param>
-        public ConnectionContext(NetConnection connection)
+        public ConnectionContext(IPeer currentPeer, NetConnection connection)
         {
+            CurrentPeer = currentPeer;
             Connection = connection;
         }
+
+        public IPeer CurrentPeer { get; }
 
         /// <summary>
         /// Gets remote paired connection object, representing connection between client and server.
@@ -28,11 +32,11 @@ namespace Socketize.Core
         /// <summary>
         /// Gets all connections currently connected to peer.
         /// </summary>
-        public IEnumerable<NetConnection> All => Connection.Peer.Connections;
+        public IEnumerable<NetConnection> All => CurrentPeer.LowLevelPeer.Connections;
 
         /// <summary>
         /// Gets all connections currently connected to peer, except current remote connection.
         /// </summary>
-        public IEnumerable<NetConnection> Others => Connection.Peer.Connections.Where(conn => conn != Connection);
+        public IEnumerable<NetConnection> Others => CurrentPeer.LowLevelPeer.Connections.Where(conn => conn != Connection);
     }
 }

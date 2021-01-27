@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Lidgren.Network;
+using Socketize.Core.Abstractions;
 using Socketize.Core.Exceptions;
 using Socketize.Core.Services.Abstractions;
 
@@ -22,11 +23,16 @@ namespace Socketize.Core.Services
         }
 
         /// <inheritdoc />
-        public void ProcessMessage(string route, NetIncomingMessage message, bool failWhenNoHandlers = true)
+        public void ProcessMessage(IPeer currentPeer, string route, NetIncomingMessage message, bool failWhenNoHandlers = true, bool ignoreContents = false)
         {
-            var messageLength = message.ReadInt32();
-            var dtoRaw = messageLength is 0 ? null : message.ReadBytes(messageLength);
-            var context = new ConnectionContext(message.SenderConnection);
+            byte[] dtoRaw = null;
+            if (!ignoreContents)
+            {
+                var messageLength = message.ReadInt32();
+                dtoRaw = messageLength is 0 ? null : message.ReadBytes(messageLength);
+            }
+
+            var context = new ConnectionContext(currentPeer, message.SenderConnection);
 
             if (!TryQueueMessageProcessing(route, context, dtoRaw) && failWhenNoHandlers)
             {
