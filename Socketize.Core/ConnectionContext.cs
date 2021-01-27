@@ -13,6 +13,7 @@ namespace Socketize.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionContext"/> class.
         /// </summary>
+        /// <param name="currentPeer">Peer object that represents current peer.</param>
         /// <param name="connection">Remote paired connection object, representing connection between client and server.</param>
         public ConnectionContext(IPeer currentPeer, NetConnection connection)
         {
@@ -20,6 +21,9 @@ namespace Socketize.Core
             Connection = connection;
         }
 
+        /// <summary>
+        /// Gets peer object that represents current peer.
+        /// </summary>
         public IPeer CurrentPeer { get; }
 
         /// <summary>

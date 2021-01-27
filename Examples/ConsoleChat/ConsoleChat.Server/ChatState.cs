@@ -2,15 +2,14 @@
 
 namespace ConsoleChat.Server
 {
-    public class Message
-    {
-        public string Nickname { get; set; }
-
-        public string Content { get; set; }
-    }
-
+    /// <summary>
+    /// Type that represents chat state.
+    /// </summary>
     public class ChatState
     {
-        public ConcurrentBag<Message> Messages { get; set; }
+        /// <summary>
+        /// Gets or sets orderer collection of messages.
+        /// </summary>
+        public ConcurrentQueue<Message> Messages { get; set; }
     }
 }

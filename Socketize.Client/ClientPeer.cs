@@ -29,6 +29,9 @@ namespace Socketize.Client
             _options = options;
         }
 
+        /// <summary>
+        /// Gets server connection context object.
+        /// </summary>
         public ConnectionContext ServerContext { get; private set; }
 
         /// <inheritdoc />
