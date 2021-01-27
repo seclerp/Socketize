@@ -2,6 +2,7 @@ using Lidgren.Network;
 using Microsoft.Extensions.Logging;
 using Socketize.Client.Configuration;
 using Socketize.Core;
+using Socketize.Core.Extensions;
 using Socketize.Core.Services.Abstractions;
 
 namespace Socketize.Client
@@ -39,6 +40,8 @@ namespace Socketize.Client
             approval.Write("Approve me please, there might be token");
 
             var serverConnection = LowLevelPeer.Connect(_options.ServerHost, _options.ServerPort, approval);
+            serverConnection.WaitForReadiness();
+
             ServerContext = new ConnectionContext(this, serverConnection);
 
             Logger.LogInformation($"Send connection approval to {_options.ServerHost}:{_options.ServerPort}");

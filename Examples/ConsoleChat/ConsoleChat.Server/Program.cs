@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using ConsoleChat.Contract;
@@ -18,13 +19,47 @@ namespace ConsoleChat.Server
     {
         private static ConcurrentDictionary<IPEndPoint, string> NicknameLookup = new ConcurrentDictionary<IPEndPoint, string>();
 
+        private static ChatState State = new ChatState { Messages = new ConcurrentBag<Message>() };
+
+        private static SyncStateDto ToChatStateDto(ChatState state)
+        {
+            return new SyncStateDto
+            {
+                Messages = state.Messages.Select(message => new MessageStateDto
+                {
+                    Nickname = message.Nickname,
+                    Content = message.Content,
+                }),
+            };
+        }
+
+        private static void ProduceChatMessage(ConnectionContext context, string message, string nickname = null, bool sendToCurrentRemotePeer = true)
+        {
+            nickname ??= "Server";
+
+            var messageModel = new Message { Nickname = nickname, Content = message };
+            State.Messages.Add(messageModel);
+
+            var messageDto = new NewMessageDto { Nickname = nickname, Content = message };
+
+            if (sendToCurrentRemotePeer)
+            {
+                context.SendToAll(MessageNames.NewMessage, messageDto);
+            }
+            else
+            {
+                context.SendToOthers(MessageNames.NewMessage, messageDto);
+            }
+        }
+
         // When user sends his nickname
         private static void OnNickname(ConnectionContext context, NicknameDto nicknameDto)
         {
             var nickname = nicknameDto.Value;
             NicknameLookup[context.Connection.RemoteEndPoint] = nickname;
 
-            context.SendToAll(MessageNames.UserJoined, new UserJoinedDto { Value = nickname });
+            ProduceChatMessage(context, $"'{nickname}' just joined conversation!", null, false);
+            context.Send(MessageNames.SyncState, ToChatStateDto(State));
         }
 
         // When peer was disconnected from the server
@@ -35,7 +70,7 @@ namespace ConsoleChat.Server
             {
                 var nickname = NicknameLookup[userEndpoint];
                 NicknameLookup.Remove(userEndpoint, out _);
-                context.SendToAll(MessageNames.UserLeft, new UserLeftDto { Value = nickname });
+                ProduceChatMessage(context, $"'{nickname}' left conversation");
             }
 
             Console.WriteLine($"'{userEndpoint}' disconnected");
@@ -55,7 +90,7 @@ namespace ConsoleChat.Server
 
             // Send message to connected users
             Console.WriteLine($"Received new message from '{nickName}', sending to other users");
-            context.SendToOthers(MessageNames.NewMessage, new NewMessageDto { Nickname = nickName, Content = sendMessageDto.Value });
+            ProduceChatMessage(context, sendMessageDto.Value, nickName);
         }
 
         static void Main(string[] args)

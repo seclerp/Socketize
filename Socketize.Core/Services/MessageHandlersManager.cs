@@ -17,8 +17,8 @@ namespace Socketize.Core.Services
     public class MessageHandlersManager : IMessageHandlersManager
     {
         private readonly IMessageHandlerFactory _factory;
-        private IDictionary<string, MethodInfo> _classHandlersMethodInfo;
-        private IDictionary<string, Func<ConnectionContext, byte[], Task>> _classHandlers;
+        private IDictionary<string, MethodInfo> _handlersMethodInfo;
+        private IDictionary<string, Func<ConnectionContext, byte[], Task>> _handlers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageHandlersManager"/> class.
@@ -35,13 +35,13 @@ namespace Socketize.Core.Services
         /// <inheritdoc />
         public Task Invoke(string route, ConnectionContext context, byte[] dtoRaw)
         {
-            return _classHandlers[route].Invoke(context, dtoRaw);
+            return _handlers[route].Invoke(context, dtoRaw);
         }
 
         /// <inheritdoc />
         public bool RouteExists(string route)
         {
-            return _classHandlers.ContainsKey(route);
+            return _handlers.ContainsKey(route);
         }
 
         private static bool IsHandlerValid(MethodInfo method, Type messageType)
@@ -80,6 +80,16 @@ namespace Socketize.Core.Services
             return args;
         }
 
+        private static IDictionary<string, MethodInfo> CreateMessageHandlersMethodInfo(
+            IDictionary<string, SchemaItem> schemaItems)
+        {
+            return schemaItems.ToDictionary(kv => kv.Key, kv =>
+                ((Type)kv.Value.Handler)
+                .GetMethods()
+                .Where(info => info.Name is "Handle")
+                .FirstOrDefault(methodInfo => IsHandlerValid(methodInfo, kv.Value.MessageType)));
+        }
+
         private IDictionary<string, Func<ConnectionContext, byte[], Task>> CreateMessageHandlers(
             IDictionary<string, SchemaItem> schemaItems)
         {
@@ -89,10 +99,10 @@ namespace Socketize.Core.Services
                 switch (kv.Value.Kind)
                 {
                     case HandlerInstanceKind.Class:
-                        var classReturnType = _classHandlersMethodInfo[item.Route].ReturnType;
+                        var classReturnType = _handlersMethodInfo[item.Route].ReturnType;
                         return CreateClassMessageHandler(item, classReturnType);
                     case HandlerInstanceKind.Delegate:
-                        var delegateReturnType = _classHandlersMethodInfo[kv.Value.Route].ReturnType;
+                        var delegateReturnType = _handlersMethodInfo[kv.Value.Route].ReturnType;
                         return CreateDelegateMessageHandler(item, delegateReturnType);
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -142,43 +152,45 @@ namespace Socketize.Core.Services
         {
             var args = PrepareArguments(item, context, dtoRaw);
 
-            _classHandlersMethodInfo[item.Route]?.Invoke(instance, args);
+            _handlersMethodInfo[item.Route]?.Invoke(instance, args);
         }
 
         private Task InvokeAsyncMessageHandler(SchemaItem item, object instance, ConnectionContext context, byte[] dtoRaw)
         {
             var args = PrepareArguments(item, context, dtoRaw);
 
-            return (Task)_classHandlersMethodInfo[item.Route]?.Invoke(instance, args);
+            return (Task)_handlersMethodInfo[item.Route]?.Invoke(instance, args);
         }
 
-        private IDictionary<string, MethodInfo> CreateMessageHandlersMethodInfo(
-            IDictionary<string, SchemaItem> schemaItems) =>
-            schemaItems.ToDictionary(kv => kv.Key, kv =>
-                ((Type)kv.Value.Handler)
-                    .GetMethods()
-                    .Where(info => info.Name is "Handle")
-                    .FirstOrDefault(methodInfo => IsHandlerValid(methodInfo, kv.Value.MessageType)));
-
         private void PopulateMethodsInfo(Schema schema)
+        {
+            var itemsByRoute = schema
+                .ToDictionary(item => item.Route, item => item);
+
+            _handlersMethodInfo =
+                GetClassMessageHandlersLookup(schema)
+                    .Concat(GetDelegateMessageHandlersLookup(schema))
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            _handlers = CreateMessageHandlers(itemsByRoute);
+        }
+
+        private IDictionary<string, MethodInfo> GetClassMessageHandlersLookup(Schema schema)
         {
             var classItemsByRoute = schema
                 .Where(item => item.Kind is HandlerInstanceKind.Class)
                 .ToDictionary(item => item.Route, item => item);
 
-            var classMessageHandlersMethodInfo = CreateMessageHandlersMethodInfo(classItemsByRoute);
+            return CreateMessageHandlersMethodInfo(classItemsByRoute);
+        }
 
+        private IDictionary<string, MethodInfo> GetDelegateMessageHandlersLookup(Schema schema)
+        {
             var delegateMessageHandlesMethodInfo = schema
                 .Where(item => item.Kind is HandlerInstanceKind.Delegate)
-                .ToDictionary(item => item.Route, item => item.Handler as MethodInfo)
-                    as IDictionary<string, MethodInfo>;
+                .ToDictionary(item => item.Route, item => item.Handler as MethodInfo) as IDictionary<string, MethodInfo>;
 
-            _classHandlersMethodInfo =
-                classMessageHandlersMethodInfo
-                    .Concat(delegateMessageHandlesMethodInfo)
-                    .ToDictionary(kv => kv.Key, kv => kv.Value);
-
-            _classHandlers = CreateMessageHandlers(classItemsByRoute);
+            return delegateMessageHandlesMethodInfo;
         }
     }
 }

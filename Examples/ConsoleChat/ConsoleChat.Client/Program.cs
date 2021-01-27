@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using ConsoleChat.Contract;
-using Lidgren.Network;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,26 +8,28 @@ using Socketize.Client;
 using Socketize.Client.Configuration;
 using Socketize.Client.DependencyInjection;
 using Socketize.Core;
-using Socketize.Core.Abstractions;
 using Socketize.Core.Extensions;
 
 namespace ConsoleChat.Client
 {
     class Program
     {
-        static void OnUserJoined(ConnectionContext context, UserJoinedDto userJoinedDto)
+        private static void PrintNewMessage(string nickname, string content)
         {
-            Console.WriteLine($"User '{userJoinedDto.Value}' joined conversation!");
-        }
-
-        static void OnUserLeft(ConnectionContext context, UserLeftDto userLeftDto)
-        {
-            Console.WriteLine($"User '{userLeftDto.Value}' left conversation.");
+            Console.WriteLine($"[{nickname}]: {content}");
         }
 
         static void OnNewMessage(ConnectionContext context, NewMessageDto newMessageDto)
         {
-            Console.WriteLine($"[{newMessageDto.Nickname}]: {newMessageDto.Content}");
+            PrintNewMessage(newMessageDto.Nickname, newMessageDto.Content);
+        }
+
+        static void OnSyncState(ConnectionContext context, SyncStateDto syncStateDto)
+        {
+            foreach (var message in syncStateDto.Messages)
+            {
+                PrintNewMessage(message.Nickname, message.Content);
+            }
         }
 
         static void Main(string[] args)
@@ -54,12 +54,12 @@ namespace ConsoleChat.Client
             var services = new ServiceCollection();
             services.AddSocketizeClient(
                 schema => schema
-                    .Route<UserJoinedDto>(MessageNames.UserJoined, OnUserJoined)
-                    .Route<UserLeftDto>(MessageNames.UserLeft, OnUserLeft)
-                    .Route<NewMessageDto>(MessageNames.NewMessage, OnNewMessage),
+                    .Route<NewMessageDto>(MessageNames.NewMessage, OnNewMessage)
+                    .Route<SyncStateDto>(MessageNames.SyncState, OnSyncState),
                 clientOptions);
             services.AddLogging(builder =>
             {
+                builder.SetMinimumLevel(LogLevel.Warning);
                 builder.AddConsole();
                 builder.AddDebug();
             });
@@ -77,8 +77,17 @@ namespace ConsoleChat.Client
             while (true)
             {
                 var newMessage = Console.ReadLine();
+                ClearPreviousConsoleLine();
                 client.ServerContext.Send(MessageNames.SendMessage, new SendMessageDto { Value = newMessage });
             }
+        }
+
+        private static void ClearPreviousConsoleLine()
+        {
+            var currentLineCursor = Console.CursorTop - 1;
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLineCursor);
         }
     }
 }
