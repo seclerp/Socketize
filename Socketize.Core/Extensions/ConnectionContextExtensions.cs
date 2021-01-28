@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Lidgren.Network;
+using Socketize.Core.Enums;
 
 namespace Socketize.Core.Extensions
 {
@@ -27,10 +29,15 @@ namespace Socketize.Core.Extensions
         /// <param name="connectionContext">Instance of <see cref="ConnectionContext"/>.</param>
         /// <param name="route">Route path.</param>
         /// <param name="messageDto">Object representing message data.</param>
+        /// <param name="deliveryMode">Message delivery mode, ReliableOrdered by default.</param>
         /// <typeparam name="T">Type of message data.</typeparam>
-        public static void Send<T>(this ConnectionContext connectionContext, string route, T messageDto)
+        public static void Send<T>(
+            this ConnectionContext connectionContext,
+            string route,
+            T messageDto,
+            MessageDeliveryMode deliveryMode = MessageDeliveryMode.ReliableOrdered)
         {
-            connectionContext.SendInternal(route, messageDto, connectionContext.Connection);
+            connectionContext.SendInternal(route, messageDto, connectionContext.Connection, deliveryMode);
         }
 
         /// <summary>
@@ -40,10 +47,16 @@ namespace Socketize.Core.Extensions
         /// <param name="endpoint">Connected remote endpoint.</param>
         /// <param name="route">Route path.</param>
         /// <param name="messageDto">Object representing message data.</param>
+        /// <param name="deliveryMode">Message delivery mode, ReliableOrdered by default.</param>
         /// <typeparam name="T">Type of message data.</typeparam>
-        public static void SendTo<T>(this ConnectionContext connectionContext, IPEndPoint endpoint, string route, T messageDto)
+        public static void SendTo<T>(
+            this ConnectionContext connectionContext,
+            IPEndPoint endpoint,
+            string route,
+            T messageDto,
+            MessageDeliveryMode deliveryMode = MessageDeliveryMode.ReliableOrdered)
         {
-            connectionContext.SendInternal(route, messageDto, connectionContext.GetConnection(endpoint));
+            connectionContext.SendInternal(route, messageDto, connectionContext.GetConnection(endpoint), deliveryMode);
         }
 
         /// <summary>
@@ -52,10 +65,15 @@ namespace Socketize.Core.Extensions
         /// <param name="connectionContext">Instance of <see cref="ConnectionContext"/>.</param>
         /// <param name="route">Route path.</param>
         /// <param name="messageDto">Object representing message data.</param>
+        /// <param name="deliveryMode">Message delivery mode, ReliableOrdered by default.</param>
         /// <typeparam name="T">Type of message data.</typeparam>
-        public static void SendToAll<T>(this ConnectionContext connectionContext, string route, T messageDto)
+        public static void SendToAll<T>(
+            this ConnectionContext connectionContext,
+            string route,
+            T messageDto,
+            MessageDeliveryMode deliveryMode = MessageDeliveryMode.ReliableOrdered)
         {
-            connectionContext.SendInternal(route, messageDto, connectionContext.All);
+            connectionContext.SendInternal(route, messageDto, connectionContext.All, deliveryMode);
         }
 
         /// <summary>
@@ -64,23 +82,48 @@ namespace Socketize.Core.Extensions
         /// <param name="connectionContext">Instance of <see cref="ConnectionContext"/>.</param>
         /// <param name="route">Route path.</param>
         /// <param name="messageDto">Object representing message data.</param>
+        /// <param name="deliveryMode">Message delivery mode, ReliableOrdered by default.</param>
         /// <typeparam name="T">Type of message data.</typeparam>
-        public static void SendToOthers<T>(this ConnectionContext connectionContext, string route, T messageDto)
+        public static void SendToOthers<T>(
+            this ConnectionContext connectionContext,
+            string route,
+            T messageDto,
+            MessageDeliveryMode deliveryMode = MessageDeliveryMode.ReliableOrdered)
         {
-            connectionContext.SendInternal(route, messageDto, connectionContext.Others);
+            connectionContext.SendInternal(route, messageDto, connectionContext.Others, deliveryMode);
         }
 
-        private static void SendInternal<T>(this ConnectionContext connectionContext, string route, T messageDto, IEnumerable<NetConnection> connections)
+        private static void SendInternal<T>(
+            this ConnectionContext connectionContext,
+            string route,
+            T messageDto,
+            IEnumerable<NetConnection> connections,
+            MessageDeliveryMode deliveryMode)
         {
-            Parallel.ForEach(connections, connection => connectionContext.SendInternal(route, messageDto, connection));
+            Parallel.ForEach(connections, connection => connectionContext.SendInternal(route, messageDto, connection, deliveryMode));
         }
 
-        private static void SendInternal<T>(this ConnectionContext connectionContext, string route, T messageDto, NetConnection connection)
+        private static void SendInternal<T>(this ConnectionContext connectionContext, string route, T messageDto, NetConnection connection, MessageDeliveryMode deliveryMode)
         {
             var message = connectionContext.CreateMessage(route, messageDto);
+            var deliveryMethod = Map(deliveryMode);
 
-            // TODO: Make delivery method optionally configurable
-            connection.SendMessage(message, NetDeliveryMethod.ReliableOrdered, 0);
+            // TODO: Make sequence channel configurable
+            // https://github.com/seclerp/Socketize/issues/12
+            connection.SendMessage(message, deliveryMethod, 0);
+        }
+
+        private static NetDeliveryMethod Map(MessageDeliveryMode deliveryMode)
+        {
+            return deliveryMode switch
+            {
+                MessageDeliveryMode.Unreliable => NetDeliveryMethod.Unreliable,
+                MessageDeliveryMode.UnreliableSequenced => NetDeliveryMethod.UnreliableSequenced,
+                MessageDeliveryMode.ReliableUnordered => NetDeliveryMethod.ReliableUnordered,
+                MessageDeliveryMode.ReliableSequenced => NetDeliveryMethod.ReliableSequenced,
+                MessageDeliveryMode.ReliableOrdered => NetDeliveryMethod.ReliableOrdered,
+                _ => throw new ArgumentOutOfRangeException(nameof(deliveryMode), deliveryMode, null),
+            };
         }
     }
 }
