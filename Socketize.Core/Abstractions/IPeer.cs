@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using Lidgren.Network;
+using Socketize.Core.Serialization.Abstractions;
 
 namespace Socketize.Core.Abstractions
 {
@@ -13,6 +14,11 @@ namespace Socketize.Core.Abstractions
         /// Gets object to interact with the connection.
         /// </summary>
         NetPeer LowLevelPeer { get; }
+
+        /// <summary>
+        /// Gets serializer instance..
+        /// </summary>
+        IDtoSerializer Serializer { get; }
 
         /// <summary>
         /// Starts and configures this <see cref="IPeer"/> instance.

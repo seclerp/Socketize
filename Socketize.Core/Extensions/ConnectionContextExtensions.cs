@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Lidgren.Network;
-using ZeroFormatter;
 
 namespace Socketize.Core.Extensions
 {
@@ -11,16 +10,6 @@ namespace Socketize.Core.Extensions
     /// </summary>
     public static class ConnectionContextExtensions
     {
-        /// <summary>
-        /// Returns new empty message to populate and send to a remote peer.
-        /// </summary>
-        /// <param name="connectionContext">Instance of <see cref="ConnectionContext"/>.</param>
-        /// <returns>Message object ready to be populated and to be sent.</returns>
-        public static NetOutgoingMessage NewMessage(this ConnectionContext connectionContext)
-        {
-            return connectionContext.CurrentPeer.LowLevelPeer.CreateMessage();
-        }
-
         /// <summary>
         /// Returns connection object to a connected remote endpoint.
         /// </summary>
@@ -88,24 +77,10 @@ namespace Socketize.Core.Extensions
 
         private static void SendInternal<T>(this ConnectionContext connectionContext, string route, T messageDto, NetConnection connection)
         {
-            var message = connectionContext.PrepareRawMessage(route, messageDto);
+            var message = connectionContext.CreateMessage(route, messageDto);
 
             // TODO: Make delivery method optionally configurable
             connection.SendMessage(message, NetDeliveryMethod.ReliableOrdered, 0);
-        }
-
-        private static NetOutgoingMessage PrepareRawMessage<T>(this ConnectionContext connectionContext, string route, T messageDto)
-        {
-            var dtoRaw = ZeroFormatterSerializer.Serialize(messageDto);
-            var message = connectionContext.NewMessage();
-            message.Write(route);
-            message.Write(dtoRaw.Length);
-            if (dtoRaw.Length != 0)
-            {
-                message.Write(dtoRaw);
-            }
-
-            return message;
         }
     }
 }

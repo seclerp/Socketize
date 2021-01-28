@@ -1,12 +1,11 @@
-﻿using Socketize.Core.Dto;
-using ZeroFormatter;
+﻿using MessagePack;
 
 namespace ConsoleChat.Contract
 {
     /// <summary>
     /// Type that represents nickname DTO.
     /// </summary>
-    [ZeroFormattable]
+    [MessagePackObject]
     public class NicknameDto : WrapperDto<string>
     {
     }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Socketize.Client.Configuration;
 using Socketize.Core;
 using Socketize.Core.Extensions;
+using Socketize.Core.Serialization.Abstractions;
 using Socketize.Core.Services.Abstractions;
 
 namespace Socketize.Client
@@ -22,9 +23,10 @@ namespace Socketize.Client
         /// <param name="options">Client configuration options.</param>
         public ClientPeer(
             IProcessingService processingService,
+            IDtoSerializer serializer,
             ILogger<ClientPeer> logger,
             ClientOptions options)
-            : base(processingService, logger)
+            : base(processingService, serializer, logger)
         {
             _options = options;
         }
@@ -45,7 +47,7 @@ namespace Socketize.Client
             var serverConnection = LowLevelPeer.Connect(_options.ServerHost, _options.ServerPort, approval);
             serverConnection.WaitForReadiness();
 
-            ServerContext = new ConnectionContext(this, serverConnection);
+            ServerContext = new ConnectionContext(this, serverConnection, Serializer);
 
             Logger.LogInformation($"Send connection approval to {_options.ServerHost}:{_options.ServerPort}");
         }

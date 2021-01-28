@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Enums;
 using Socketize.Core.Routing;
+using Socketize.Core.Serialization.Abstractions;
 using Socketize.Core.Services.Abstractions;
-using ZeroFormatter;
 
 namespace Socketize.Core.Services
 {
@@ -17,6 +17,7 @@ namespace Socketize.Core.Services
     public class MessageHandlersManager : IMessageHandlersManager
     {
         private readonly IMessageHandlerFactory _factory;
+        private readonly IDtoSerializer _serializer;
         private IDictionary<string, MethodInfo> _handlersMethodInfo;
         private IDictionary<string, Func<ConnectionContext, byte[], Task>> _handlers;
 
@@ -25,9 +26,10 @@ namespace Socketize.Core.Services
         /// </summary>
         /// <param name="schema">Schema instance.</param>
         /// <param name="factory">Factory for message handlers.</param>
-        public MessageHandlersManager(Schema schema, IMessageHandlerFactory factory)
+        public MessageHandlersManager(Schema schema, IMessageHandlerFactory factory, IDtoSerializer serializer)
         {
             _factory = factory;
+            _serializer = serializer;
 
             PopulateMethodsInfo(schema);
         }
@@ -64,7 +66,7 @@ namespace Socketize.Core.Services
             return false;
         }
 
-        private static object[] PrepareArguments(SchemaItem item, ConnectionContext context, byte[] rawDto)
+        private object[] PrepareArguments(SchemaItem item, ConnectionContext context, byte[] rawDto)
         {
             object[] args;
             if (item.MessageType is null)
@@ -73,7 +75,7 @@ namespace Socketize.Core.Services
             }
             else
             {
-                var dto = ZeroFormatterSerializer.NonGeneric.Deserialize(item.MessageType, rawDto);
+                var dto = _serializer.Deserialize(item.MessageType, rawDto);
                 args = new[] { context, dto };
             }
 

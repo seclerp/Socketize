@@ -1,6 +1,7 @@
 using Lidgren.Network;
 using Microsoft.Extensions.Logging;
 using Socketize.Core;
+using Socketize.Core.Serialization.Abstractions;
 using Socketize.Core.Services.Abstractions;
 using Socketize.Server.Configuration;
 
@@ -21,9 +22,10 @@ namespace Socketize.Server
         /// <param name="options">Server configuration options.</param>
         public ServerPeer(
             IProcessingService processingService,
+            IDtoSerializer serializer,
             ILogger<ServerPeer> logger,
             ServerOptions options)
-            : base(processingService, logger)
+            : base(processingService, serializer, logger)
         {
             _options = options;
         }

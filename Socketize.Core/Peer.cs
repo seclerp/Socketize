@@ -5,6 +5,7 @@ using Lidgren.Network;
 using Microsoft.Extensions.Logging;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Routing;
+using Socketize.Core.Serialization.Abstractions;
 using Socketize.Core.Services.Abstractions;
 
 namespace Socketize.Core
@@ -21,14 +22,18 @@ namespace Socketize.Core
         /// </summary>
         /// <param name="processingService">service that processes incoming messages.</param>
         /// <param name="logger">Logger instance.</param>
-        protected Peer(IProcessingService processingService, ILogger<Peer> logger)
+        protected Peer(IProcessingService processingService, IDtoSerializer serializer, ILogger<Peer> logger)
         {
             _processingService = processingService;
+            Serializer = serializer;
             Logger = logger;
         }
 
         /// <inheritdoc/>
         public NetPeer LowLevelPeer { get; private set; }
+
+        /// <inheritdoc/>
+        public IDtoSerializer Serializer { get; }
 
         /// <summary>
         /// Gets logger instance.
@@ -37,7 +42,7 @@ namespace Socketize.Core
 
         /// <inheritdoc />
         public ConnectionContext CreateRemoteContext(IPEndPoint target) =>
-            new ConnectionContext(this, LowLevelPeer.GetConnection(target));
+            new ConnectionContext(this, LowLevelPeer.GetConnection(target), Serializer);
 
         /// <inheritdoc />
         public virtual void Start()

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Lidgren.Network;
 using Socketize.Core.Abstractions;
 using Socketize.Core.Exceptions;
+using Socketize.Core.Serialization.Abstractions;
 using Socketize.Core.Services.Abstractions;
 
 namespace Socketize.Core.Services
@@ -12,14 +13,16 @@ namespace Socketize.Core.Services
     public class ProcessingService : IProcessingService
     {
         private readonly IMessageHandlersManager _messageHandlersManager;
+        private readonly IDtoSerializer _serializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessingService"/> class.
         /// </summary>
         /// <param name="messageHandlersManager">Manager for message handlers.</param>
-        public ProcessingService(IMessageHandlersManager messageHandlersManager)
+        public ProcessingService(IMessageHandlersManager messageHandlersManager, IDtoSerializer serializer)
         {
             _messageHandlersManager = messageHandlersManager;
+            _serializer = serializer;
         }
 
         /// <inheritdoc />
@@ -32,7 +35,7 @@ namespace Socketize.Core.Services
                 dtoRaw = messageLength is 0 ? null : message.ReadBytes(messageLength);
             }
 
-            var context = new ConnectionContext(currentPeer, message.SenderConnection);
+            var context = new ConnectionContext(currentPeer, message.SenderConnection, _serializer);
 
             if (!TryQueueMessageProcessing(route, context, dtoRaw) && failWhenNoHandlers)
             {

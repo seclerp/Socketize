@@ -1,6 +1,6 @@
-﻿using ZeroFormatter;
+﻿using MessagePack;
 
-namespace Socketize.Core.Dto
+namespace ConsoleChat.Contract
 {
     /// <summary>
     /// Shortcut class for creating simple wrapper DTOs.
@@ -12,7 +12,7 @@ namespace Socketize.Core.Dto
         /// <summary>
         /// Gets or sets value of wrapper object.
         /// </summary>
-        [Index(0)]
+        [Key(0)]
         public virtual TValue Value { get; set; }
     }
 }
