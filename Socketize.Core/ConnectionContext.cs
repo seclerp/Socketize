@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Lidgren.Network;
 using Socketize.Core.Abstractions;
-using Socketize.Core.Extensions;
 using Socketize.Core.Serialization.Abstractions;
 
 namespace Socketize.Core
@@ -19,6 +18,7 @@ namespace Socketize.Core
         /// </summary>
         /// <param name="currentPeer">Peer object that represents current peer.</param>
         /// <param name="connection">Remote paired connection object, representing connection between client and server.</param>
+        /// <param name="serializer">DTO serializer instance.</param>
         public ConnectionContext(IPeer currentPeer, NetConnection connection, IDtoSerializer serializer)
         {
             _serializer = serializer;
@@ -54,7 +54,7 @@ namespace Socketize.Core
         /// <param name="route">Route to send message to.</param>
         /// <param name="messageDto">Message DTO payload object.</param>
         /// <typeparam name="T">Type of message DTO payload object.</typeparam>
-        /// <returns>Outgoing low level message</returns>
+        /// <returns>Outgoing low level message.</returns>
         public NetOutgoingMessage CreateMessage<T>(string route, T messageDto)
         {
             var dtoRaw = _serializer.Serialize(messageDto);

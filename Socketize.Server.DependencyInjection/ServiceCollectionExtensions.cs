@@ -49,6 +49,7 @@ namespace Socketize.Server.DependencyInjection
         /// <param name="services">Instance of <see cref="IServiceCollection"/>.</param>
         /// <param name="schemaConfig">Delegate that configures schema.</param>
         /// <param name="options">Server configuration options instance.</param>
+        /// <param name="serializerFactory">Factory that provides DTO serializer instance.</param>
         /// <returns>Configured instance of <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddSocketizeServer(
             this IServiceCollection services,

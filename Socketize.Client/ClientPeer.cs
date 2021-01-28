@@ -19,6 +19,7 @@ namespace Socketize.Client
         /// Initializes a new instance of the <see cref="ClientPeer"/> class.
         /// </summary>
         /// <param name="processingService">Instance of <see cref="IProcessingService"/> used to process incoming messages.</param>
+        /// <param name="serializer">DTO serializer instance.</param>
         /// <param name="logger">Instance of <see cref="ILogger{TCategoryName}"/>.</param>
         /// <param name="options">Client configuration options.</param>
         public ClientPeer(

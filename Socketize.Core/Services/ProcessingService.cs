@@ -19,6 +19,7 @@ namespace Socketize.Core.Services
         /// Initializes a new instance of the <see cref="ProcessingService"/> class.
         /// </summary>
         /// <param name="messageHandlersManager">Manager for message handlers.</param>
+        /// <param name="serializer">DTO serializer instance.</param>
         public ProcessingService(IMessageHandlersManager messageHandlersManager, IDtoSerializer serializer)
         {
             _messageHandlersManager = messageHandlersManager;

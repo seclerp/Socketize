@@ -21,6 +21,7 @@ namespace Socketize.Core
         /// Initializes a new instance of the <see cref="Peer"/> class.
         /// </summary>
         /// <param name="processingService">service that processes incoming messages.</param>
+        /// <param name="serializer">DTO serializer instance.</param>
         /// <param name="logger">Logger instance.</param>
         protected Peer(IProcessingService processingService, IDtoSerializer serializer, ILogger<Peer> logger)
         {

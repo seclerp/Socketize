@@ -26,6 +26,7 @@ namespace Socketize.Core.Services
         /// </summary>
         /// <param name="schema">Schema instance.</param>
         /// <param name="factory">Factory for message handlers.</param>
+        /// <param name="serializer">DTO serializer instance.</param>
         public MessageHandlersManager(Schema schema, IMessageHandlerFactory factory, IDtoSerializer serializer)
         {
             _factory = factory;
@@ -66,22 +67,6 @@ namespace Socketize.Core.Services
             return false;
         }
 
-        private object[] PrepareArguments(SchemaItem item, ConnectionContext context, byte[] rawDto)
-        {
-            object[] args;
-            if (item.MessageType is null)
-            {
-                args = new object[] { context };
-            }
-            else
-            {
-                var dto = _serializer.Deserialize(item.MessageType, rawDto);
-                args = new[] { context, dto };
-            }
-
-            return args;
-        }
-
         private static IDictionary<string, MethodInfo> CreateMessageHandlersMethodInfo(
             IDictionary<string, SchemaItem> schemaItems)
         {
@@ -110,6 +95,22 @@ namespace Socketize.Core.Services
                         throw new ArgumentOutOfRangeException();
                 }
             });
+        }
+
+        private object[] PrepareArguments(SchemaItem item, ConnectionContext context, byte[] rawDto)
+        {
+            object[] args;
+            if (item.MessageType is null)
+            {
+                args = new object[] { context };
+            }
+            else
+            {
+                var dto = _serializer.Deserialize(item.MessageType, rawDto);
+                args = new[] { context, dto };
+            }
+
+            return args;
         }
 
         private Func<ConnectionContext, byte[], Task> CreateClassMessageHandler(SchemaItem item, Type handlerReturnType)

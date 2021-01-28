@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Lidgren.Network;
 using Microsoft.Extensions.Hosting;
 using Socketize.Core.Abstractions;
 
